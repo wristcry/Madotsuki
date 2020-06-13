@@ -90,7 +90,7 @@ namespace madotsuki {
 
         static void collect_trash() {
             for (; ; ) {
-                Thread.Sleep(config.trash_cooldown_sec * 1000);
+                Thread.Sleep(data.trash_cooldown_sec * 1000);
                 debug.log("Collecting trash...", find_thread("GC Thread"));
                 GC.Collect();
                 debug.log("Trash collected", find_thread("GC Thread"));

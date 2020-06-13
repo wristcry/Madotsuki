@@ -1,0 +1,1 @@
+﻿C++ names cuz they're looks better then C# names

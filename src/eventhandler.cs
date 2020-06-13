@@ -1,12 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using madotsuki.config;
 
 namespace madotsuki {
     public class eventhandler {
@@ -31,20 +29,18 @@ namespace madotsuki {
         }
 
         private async Task guild_joined(SocketGuild server) {
-            data.server_add(server.Name.ToString(), server.Id.ToString());
+            data.add_server(server.Name, server.Id);
             await Task.Delay(5);
         }
 
         private async Task guild_left(SocketGuild server) {
-            data.server_remove(server.Id.ToString());
+            data.remove_server(server.Name);
             await Task.Delay(5);
         }
 
         private async Task user_joined(SocketGuildUser user) {
             if (user.Id == _discord.CurrentUser.Id)
                 return;
-
-            ulong channelid = data.logchannel_get(user.Guild.Id.ToString());
 
             var Author = new EmbedAuthorBuilder()
                     .WithName("User Joined")
@@ -56,15 +52,12 @@ namespace madotsuki {
                 "ID: " + user.Id.ToString())
                 .WithAuthor(Author);
 
-            if (channelid != 0)
-                await user.Guild.GetTextChannel(channelid).SendMessageAsync("", false, eb.Build());
+            if (data.contains_logchannel(user.Guild.Id)) await user.Guild.GetTextChannel(data.get_logchannel(user.Guild.Id)).SendMessageAsync("", false, eb.Build());
         }
 
         private async Task user_left(SocketGuildUser user) {
             if (user.Id == _discord.CurrentUser.Id) return;
             if (banned.Contains(user.Id)) return;
-            
-            ulong channelid = data.logchannel_get(user.Guild.Id.ToString());
 
             var Author = new EmbedAuthorBuilder()
                     .WithName("User Left")
@@ -76,16 +69,13 @@ namespace madotsuki {
                 "ID: " + user.Id.ToString() + "\n")
                 .WithAuthor(Author);
 
-            if (channelid != 0)
-                await user.Guild.GetTextChannel(channelid).SendMessageAsync("", false, eb.Build());
+            if (data.contains_logchannel(user.Guild.Id)) await user.Guild.GetTextChannel(data.get_logchannel(user.Guild.Id)).SendMessageAsync("", false, eb.Build());
         }
 
         private async Task user_banned(SocketUser user, SocketGuild server) {
             if (user.Id == _discord.CurrentUser.Id) return;
 
             banned.Add(user.Id);
-
-            ulong channelid = data.logchannel_get(server.Id.ToString());
 
             var Author = new EmbedAuthorBuilder()
                     .WithName("User Banned")
@@ -97,8 +87,7 @@ namespace madotsuki {
                 "ID: " + user.Id.ToString() + "\n")
                 .WithAuthor(Author);
 
-            if (channelid != 0)
-                await server.GetTextChannel(channelid).SendMessageAsync("", false, eb.Build());
+            if (data.contains_logchannel(server.Id)) await server.GetTextChannel(data.get_logchannel(server.Id)).SendMessageAsync("", false, eb.Build());
 
             await Task.Delay(1000);
             banned.Remove(user.Id);
@@ -107,8 +96,6 @@ namespace madotsuki {
         private async Task user_unbanned(SocketUser user, SocketGuild server) {
             if (user.Id == _discord.CurrentUser.Id)
                 return;
-
-            ulong channelid = data.logchannel_get(server.Id.ToString());
 
             var Author = new EmbedAuthorBuilder()
                     .WithName("User Unbanned")
@@ -120,16 +107,13 @@ namespace madotsuki {
                 "ID: " + user.Id.ToString() + "\n")
                 .WithAuthor(Author);
 
-            if (channelid != 0)
-                await server.GetTextChannel(channelid).SendMessageAsync("", false, eb.Build());
+            if (data.contains_logchannel(server.Id)) await server.GetTextChannel(data.get_logchannel(server.Id)).SendMessageAsync("", false, eb.Build());
         }
 
         private async Task user_updated(SocketGuildUser ouser, SocketGuildUser nuser) {
             if (ouser.Id == _discord.CurrentUser.Id || nuser.Id == _discord.CurrentUser.Id) return;
             if (ouser.Activity != nuser.Activity) return;
             if (ouser.Status != nuser.Status) return;
-
-            ulong channelid = data.logchannel_get(ouser.Guild.Id.ToString());
 
             var Author = new EmbedAuthorBuilder()
                     .WithName("User Updated")
@@ -174,8 +158,7 @@ namespace madotsuki {
                 .WithDescription(desc)
                 .WithAuthor(Author);
 
-            if (channelid != 0)
-                await ouser.Guild.GetTextChannel(channelid).SendMessageAsync("", false, eb.Build());
+            if (data.contains_logchannel(ouser.Guild.Id)) await ouser.Guild.GetTextChannel(data.get_logchannel(ouser.Guild.Id)).SendMessageAsync("", false, eb.Build());
         }
     }
 }

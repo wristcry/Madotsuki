@@ -18,6 +18,7 @@ namespace madotsuki {
         public static thread[] _threads = new thread[MAX_THREADS];
 
         static void Main(string[] args) {
+            Thread.Sleep(1500);
             _threads[0] = new thread("Main Thread", 0, Thread.CurrentThread);
 
             if (!utils.is_supported()) {
@@ -28,7 +29,6 @@ namespace madotsuki {
 
             utils.init();
             data.init();
-            config.init();
             debug.init();
             
             for (int i = 0; i < _threads.Length; i++)
@@ -47,7 +47,7 @@ namespace madotsuki {
                 services.GetRequiredService<CommandService>().Log += log;
 
                 try {
-                    await _client.LoginAsync(TokenType.Bot, config.token);
+                    await _client.LoginAsync(TokenType.Bot, data.token);
                     await _client.StartAsync();
                 }
                 catch {
@@ -62,7 +62,7 @@ namespace madotsuki {
                 await services.GetRequiredService<eventhandler>().init();
 
                 await _client.SetStatusAsync(UserStatus.DoNotDisturb);
-                await _client.SetGameAsync(config.prefix + "help");
+                await _client.SetGameAsync(data.prefix + "help");
 
                 await Task.Delay(-1);
             }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -11,19 +9,17 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Data;
-using System.Threading;
-using System.Threading.Channels;
 
 namespace madotsuki {
     public class commands : InteractiveBase<SocketCommandContext> {
         // cuz inline and #define sucks
         // am i right, microsoft?
         private static bool is_owner(SocketUser user) {
-            return user.Id.ToString() == config.ownerid;
+            return user.Id.ToString() == data.ownerid;
         }
 
         private static bool is_allowed(SocketUser user) {
-            return data.allowed_users.Contains(user.Id.ToString());
+            return data.is_allowed(user.Id);
         }
 
         private async Task ASSERTUSER(SocketUser user) {
@@ -298,25 +294,48 @@ namespace madotsuki {
         [Command("setlogchannel", RunMode = RunMode.Async)]
         [RequireUserPermission(GuildPermission.ViewAuditLog)]
         public async Task command_setlogchannel() {
-            if (data.logchannel_add(Context.Guild.Id.ToString(), Context.Channel.Id.ToString())) await ReplyAsync("Channel " + Context.Channel.Name + " has been successfully selected for logging.");
-            else await ReplyAsync("Channel " + Context.Guild.GetTextChannel(data.logchannel_get(Context.Guild.Id.ToString())).Name + " is already selected for logging.");
+            var channel = Context.Guild.GetTextChannel((ulong)data.get_logchannel(Context.Guild.Id));
+            if (data.contains_logchannel(Context.Guild.Id)) {
+                if (Context.Channel.Id == channel.Id) {
+                    await ReplyAsync("Channel " + Context.Channel.Name + " is already selected for logging.");
+                    return;
+                }
+                else {
+                    await ReplyAsync("This server already have channel that selected for logging: " + channel.Name);
+                    return;
+                }
+            }
+            if (data.add_logchannel(Context.Guild.Id, Context.Channel.Id)) await ReplyAsync("Channel " + Context.Channel.Name + " has been successfully selected for logging.");
+            channel = null;
         }
 
         [Command("unsetlogchannel", RunMode = RunMode.Async)]
         [RequireUserPermission(GuildPermission.ViewAuditLog)]
         public async Task command_unsetlogchannel() {
-            if (data.logchannel_remove(Context.Guild.Id.ToString())) await ReplyAsync("Channel " + Context.Guild.GetTextChannel(data.logchannel_get(Context.Guild.Id.ToString())).Name + " is no longer selected for logging.");
-            else await ReplyAsync("This server doesn't have any channels selected for logging.");
+            if (!data.contains_logchannel(Context.Guild.Id)) {
+                await ReplyAsync("This server doesn't have any channels selected for logging.");
+                return;
+            }
+            var channel = Context.Guild.GetTextChannel(data.get_logchannel(Context.Guild.Id));
+            if (channel.Id != Context.Channel.Id) {
+                await ReplyAsync("Can't deselect current channel, because another channel is selected for logging: " + channel.Name);
+                return;
+            }
+            if (data.remove_logchannel(Context.Guild.Id)) await ReplyAsync("Channel " + Context.Channel.Name + " is no longer selected for logging.");
+            channel = null;
         }
 
         [Command("islogchannel", RunMode = RunMode.Async)]
         [RequireUserPermission(GuildPermission.ViewAuditLog)]
         public async Task command_islogchannel() {
-            if (data.logchannel_get(Context.Guild.Id.ToString(), out ulong channelid)) { 
-                if (Context.Channel.Id == Context.Guild.GetTextChannel(channelid).Id) await ReplyAsync("Channel " + Context.Channel.Name + " is selected for logging.");
-                else await ReplyAsync("Channel " + Context.Channel.Name + " is not selected for logging.");
+            if (!data.contains_logchannel(Context.Guild.Id)) {
+                await ReplyAsync("This server doesn't have any channels selected for logging.");
+                return;
             }
-            else await ReplyAsync("This server doesn't have any channels selected for logging.");
+            var channel = Context.Guild.GetTextChannel(data.get_logchannel(Context.Guild.Id));
+            if (Context.Channel.Id == data.get_logchannel(Context.Guild.Id)) await ReplyAsync("Channel " + Context.Channel.Name + " is selected for logging.");
+            else await ReplyAsync("Channel " + Context.Channel.Name + " is not selected for logging. Channel that selected for logging: " + channel.Name);
+            channel = null;
         }
 
         [Command("deletemessages", RunMode = RunMode.Async)]

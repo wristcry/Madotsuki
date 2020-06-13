@@ -1,105 +1,72 @@
 ﻿using System;
 using System.IO;
+using madotsuki.config;
 
 namespace madotsuki {
     public class data {
-        private static readonly string DATA_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data");
-        private static readonly string SERVERS_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data/servers.owo");
-        private static readonly string LOGCHANNELS_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data/logchannels.owo");
-        private static readonly string ALLOWED_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data/allowedusers.owo");
+        static readonly string DATA_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data");
+        static readonly string CONFIG_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data/config.owo");
+        static readonly string SERVERS_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data/servers.owo");
+        static readonly string LOGCHANNELS_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data/logchannels.owo");
+        static readonly string ALLOWED_PATH = Path.Combine(Directory.GetCurrentDirectory(), "data/allowedusers.owo");
 
-        public static string[] allowed_users;
+        static readonly map configowo = new map(CONFIG_PATH);
+        static readonly map serversowo = new map(SERVERS_PATH);
+        static readonly map logchannelsowo = new map(LOGCHANNELS_PATH);
+        static readonly vector allowedusersowo = new vector(ALLOWED_PATH);
+
+        public static string token { get; private set; }
+        public static string prefix { get; private set; }
+        public static string ownerid { get; private set; }
+        public static int trash_cooldown_sec { get; private set; }
 
         public static void init() {
             if (!Directory.Exists(DATA_PATH))
                 Directory.CreateDirectory(DATA_PATH);
 
-            if (!File.Exists(SERVERS_PATH))
-                File.WriteAllText(SERVERS_PATH, string.Empty);
+            configowo.init(new map_pair[4] { 
+                new map_pair("token", "put_ur_token_here"),
+                new map_pair("prefix", '!'),
+                new map_pair("ownerid", "put_ur_discord_id_here"),
+                new map_pair("trash_cooldown_sec", 1800)
+            });
+            serversowo.init();
+            logchannelsowo.init();
+            allowedusersowo.init();
 
-            if (!File.Exists(LOGCHANNELS_PATH))
-                File.WriteAllText(LOGCHANNELS_PATH, string.Empty);
-
-            if (!File.Exists(ALLOWED_PATH))
-                File.WriteAllText(ALLOWED_PATH, string.Empty);
-
-            if (new FileInfo(ALLOWED_PATH).Length > 0) allowed_users = File.ReadAllText(ALLOWED_PATH).Split('\n');
-            else allowed_users = new string[1];
+            token = configowo.get_value<string>("token");
+            prefix = configowo.get_value<string>("prefix");
+            ownerid = configowo.get_value<string>("ownerid");
+            trash_cooldown_sec = (int)configowo.get_value<int>("trash_cooldown_sec");
         }
 
-        public static bool server_add(string name, string id) {
-            if (File.ReadAllText(SERVERS_PATH).Contains(id)) return false;
-            using (StreamWriter file = new StreamWriter(SERVERS_PATH, true)) {
-                file.WriteLine(name + ":" + id);
-                file.Close();
-            }
-            return true;
+        public static bool add_server(string name, ulong id) {
+            return data.serversowo.add(new map_pair(name, id));
         }
 
-        // Todo
-        public static bool server_remove(string nameorid) {
-            string[] content = File.ReadAllLines(SERVERS_PATH);
-            File.Delete(SERVERS_PATH);
-            File.WriteAllText(SERVERS_PATH, string.Empty);
-            for (int i = 0; i < content.Length; i++) {
-                if (!content[i].Contains(nameorid)) {
-                    using (StreamWriter file = new StreamWriter(SERVERS_PATH, true)) {
-                        file.WriteLine(content[i]);
-                        file.Close();
-                    }
-                }
-            }
-            return false;
+        public static bool remove_server(string name) {
+            return data.serversowo.remove(name);
         }
 
-        public static bool logchannel_add(string serverid, string channelid) {
-            if (File.ReadAllText(LOGCHANNELS_PATH).Contains(serverid)) return false;
-            using (StreamWriter file = new StreamWriter(LOGCHANNELS_PATH, true)) {
-                file.WriteLine(serverid + ":" + channelid);
-                file.Close();
-            }
-            return true;
+        public static bool add_logchannel(ulong server_id, ulong channel_id) {
+            return data.logchannelsowo.add(new map_pair(server_id.ToString(), channel_id));
         }
 
-        // Todo
-        public static bool logchannel_remove(string serverorchannelid) {
-            string[] content = File.ReadAllLines(LOGCHANNELS_PATH);
-            File.Delete(LOGCHANNELS_PATH);
-            File.WriteAllText(LOGCHANNELS_PATH, string.Empty);
-            for (int i = 0; i < content.Length; i++) {
-                if (!content[i].Contains(serverorchannelid)) {
-                    using (StreamWriter file = new StreamWriter(LOGCHANNELS_PATH, true)) {
-                        file.WriteLine(content[i]);
-                        file.Close();
-                    }
-                }
-            }
-            return true;
+        public static bool remove_logchannel(ulong server_id) {
+            return data.logchannelsowo.remove(server_id.ToString());
         }
 
-        public static bool logchannel_get(string serverid, out ulong channelid) {
-            string temp = null;
-            string[] content = File.ReadAllLines(LOGCHANNELS_PATH);
-            for (int i = 0; i < content.Length; i++)
-                if (content[i].Contains(serverid)) temp = content[i].Replace(":", string.Empty).Replace(serverid, string.Empty).Replace("\n", string.Empty);
-            ulong result;
-            if (temp != null) {
-                channelid = Convert.ToUInt64(temp);
-                return true;
-            }
-            else {
-                channelid = (ulong)1337;
-                return false;
-            }
+        public static ulong get_logchannel(ulong server_id) {
+            object get = data.logchannelsowo.get_value<ulong>(server_id.ToString());
+            return get != null ? (ulong)get : (ulong)0;
         }
 
-        public static ulong logchannel_get(string serverid) {
-            string temp = null;
-            string[] content = File.ReadAllLines(LOGCHANNELS_PATH);
-            for (int i = 0; i < content.Length; i++)
-                if (content[i].Contains(serverid)) temp = content[i].Replace(":", string.Empty).Replace(serverid, string.Empty).Replace("\n", string.Empty);
-            if (temp != null) return Convert.ToUInt64(temp);
-            else return 0;
+        public static bool contains_logchannel(ulong server_id) {
+            return data.logchannelsowo.contains(server_id.ToString());
+        }
+
+        public static bool is_allowed(ulong user_id) {
+            return data.allowedusersowo.contains(user_id);
         }
     }
 }

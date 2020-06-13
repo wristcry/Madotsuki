@@ -31,7 +31,7 @@ namespace madotsuki {
             if (message.Source != MessageSource.User) return;
 
             var argPos = 0;
-            if (!message.HasStringPrefix(config.prefix, ref argPos)) return;
+            if (!message.HasStringPrefix(data.prefix, ref argPos)) return;
 
             var context = new SocketCommandContext(_discord, message);
             if (context.Guild != null)

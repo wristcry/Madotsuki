@@ -4,4 +4,3 @@ maybe i'll add music later (if i'll not forget about this project like i usually
 todo:
 
 1. more features
-2. better configs

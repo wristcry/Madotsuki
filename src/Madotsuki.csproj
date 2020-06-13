@@ -23,6 +23,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="config\README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Discord.Addons.Interactive" Version="1.0.1" />
     <PackageReference Include="Discord.Net" Version="2.2.0" />
     <PackageReference Include="Discord.Net.Analyzers" Version="2.2.0" />
