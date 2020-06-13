@@ -1,0 +1,6 @@
+/obj/*
+/src/obj/*
+/src/.vs/*
+/src/Madotsuki.csproj.user
+/build/*
+/publish/*

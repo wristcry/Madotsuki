@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Madotsuki", "Madotsuki.csproj", "{BCDFD557-E682-4166-8750-26CE1585C01D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCDFD557-E682-4166-8750-26CE1585C01D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCDFD557-E682-4166-8750-26CE1585C01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCDFD557-E682-4166-8750-26CE1585C01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCDFD557-E682-4166-8750-26CE1585C01D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0EC23826-DE68-4A8C-AB97-C21B7F28F129}
+	EndGlobalSection
+EndGlobal
