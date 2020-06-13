@@ -62,8 +62,10 @@ namespace madotsuki.config {
             for (int i = 0; i < l.Count; i++)
                 if (l[i].Contains(element.ToString())) l.RemoveAt(i);
             string output = string.Empty;
-            for (int i = 0; i < l.Count; i++)
+            for (int i = 0; i < l.Count; i++) {
+                if (String.IsNullOrEmpty(l[i]) || String.IsNullOrWhiteSpace(l[i])) continue;
                 output += (l[i] + '\n');
+            }
             l.Clear();
             l = null;
             File.WriteAllText(path, output);

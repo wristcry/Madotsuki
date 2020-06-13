@@ -231,6 +231,18 @@ namespace madotsuki {
             else await ReplyAsync("The log file for this date is missing.");
         }
 
+        [Command("addallowed", RunMode = RunMode.Async)]
+        public async Task command_addallowed(ulong id) {
+            await ASSERTOWNER(Context.User);
+            if (data.add_allowed(id)) await ReplyAsync(id + " has been added to allowed users list");
+        }
+
+        [Command("removeallowed", RunMode = RunMode.Async)]
+        public async Task command_removeallowed(ulong id) {
+            await ASSERTOWNER(Context.User);
+            if (data.remove_allowed(id)) await ReplyAsync(id + " has been removed from allowed users list");
+        }
+
         [Command("guid", RunMode = RunMode.Async)]
         public async Task command_guid(int amount, bool hyphens) {
             if (amount <= 20) {

@@ -37,7 +37,7 @@ namespace madotsuki {
             token = configowo.get_value<string>("token");
             prefix = configowo.get_value<string>("prefix");
             ownerid = configowo.get_value<string>("ownerid");
-            trash_cooldown_sec = (int)configowo.get_value<int>("trash_cooldown_sec");
+            trash_cooldown_sec = configowo.get_value<int>("trash_cooldown_sec");
         }
 
         public static bool add_server(string name, ulong id) {
@@ -67,6 +67,14 @@ namespace madotsuki {
 
         public static bool is_allowed(ulong user_id) {
             return data.allowedusersowo.contains(user_id);
+        }
+
+        public static bool add_allowed(ulong user_id) {
+            return data.allowedusersowo.add(user_id);
+        }
+
+        public static bool remove_allowed(ulong user_id) {
+            return data.allowedusersowo.remove(user_id);
         }
     }
 }
