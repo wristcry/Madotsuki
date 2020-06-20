@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Management;
 using System.IO;
 using System.Linq;
+using Discord.WebSocket;
 
 namespace madotsuki {
     public class utils {
@@ -74,6 +75,14 @@ namespace madotsuki {
             }
             
             return 0;
+        }
+
+        public static string get_server_name(SocketGuild server) {
+            return server != null ? server.Name : "pm message";
+        }
+
+        public static string get_server_id(SocketGuild server) {
+            return server != null ? server.Id.ToString() : "pm message";
         }
 
         // i mean, cmon microsoft, add #define, im fuckin bored of making things like that

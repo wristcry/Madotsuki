@@ -192,8 +192,8 @@ namespace madotsuki {
               "Framework: " + typeof(Discord.TokenUtils).Assembly.FullName.Split(',')[0] + typeof(Discord.TokenUtils).Assembly.FullName.Split(',')[1].Replace("Version=", " v") + "\n" +
               "Servers: " + Context.Client.Guilds.Count.ToString() + "\n" +
               "Polls: " + polls.Count.ToString() + "\n" +
-              "Current Server Name: " + Context.Guild.Name + "\n" +
-              "Current Server ID: " + Context.Guild.Id + "\n" +
+              "Current Server Name: " + utils.get_server_name(Context.Guild) + "\n" +
+              "Current Server ID: " + utils.get_server_id(Context.Guild) + "\n" +
               "Current Text Channel Name: " + Context.Message.Channel.Name + "\n" +
               "Current Text Channel ID: " + Context.Message.Channel.Id.ToString() + "\n" +
               "Current Message ID: " + Context.Message.Id.ToString() + "\n");

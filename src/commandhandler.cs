@@ -34,10 +34,9 @@ namespace madotsuki {
             if (!message.HasStringPrefix(data.prefix, ref argPos)) return;
 
             var context = new SocketCommandContext(_discord, message);
-            if (context.Guild != null)
-                debug.log(context.User.Username + "[id=" + context.User.Id + ", guild_id=" + context.Guild.Id + ", guild_name=" + context.Guild.Name + "]" + ": " + context.Message.Content);
-            else
-                debug.log(context.User.Username + "[id=" + context.User.Id + ", pm message" + "]" + ": " + context.Message.Content);
+
+            debug.log(context.User.Username + "[id=" + context.User.Id + ", guild_id=" + utils.get_server_id(context.Guild) + ", guild_name=" + utils.get_server_name(context.Guild) + "]" + ": " + context.Message.Content);
+
             await _commands.ExecuteAsync(context, argPos, _services);
         }
 
