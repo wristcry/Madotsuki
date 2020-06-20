@@ -121,7 +121,11 @@ namespace madotsuki {
 
             string desc = "Username: " + ouser.Username + "\n" +
                 "ID: " + ouser.Id + "\n\n";
-            if (ouser.Nickname != nuser.Nickname) desc += "Nickname: " + ouser.Nickname + " -> " + nuser.Nickname;
+            if (ouser.Nickname != nuser.Nickname) {
+                if (ouser.Nickname == null) desc += "Nickname: " + ouser.Username + " -> " + nuser.Nickname;
+                else if (nuser.Nickname == null) desc += "Nickname: " + ouser.Nickname + " -> " + nuser.Username;
+                else desc += "Nickname: " + ouser.Nickname + " -> " + nuser.Nickname;
+            }
             /*else if (ouser.Roles != nuser.Roles) {
                 string[] ouser_roles;
                 string[] nuser_roles;
